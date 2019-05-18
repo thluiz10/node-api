@@ -10,13 +10,8 @@ requireDir('./src/models')
 // const Product = mongoose.model('Product');
 
 // req contains all possible details of the request and res is response to the request
-app.get('/', (req,res) => {
-  // Product.create({ 
-  //   title: "React native", 
-  //   description: "Build native apps with React",
-  //   url:"http://github.com/facebook/react-native"
-  // })
-  return res.send("Hello World")
-});
+
+// First route
+app.use('/api', require('./src/routes'))
 
 app.listen(3001);
