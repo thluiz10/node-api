@@ -3,6 +3,7 @@ const mongoose = require ('mongoose');
 const requireDir = require('require-dir');
 
 const app = express();
+app.use(express.json()); //allow me to send json to the application
 
 mongoose.connect('mongodb://localhost:27017/nodeapi', {useNewUrlParser: true})
 requireDir('./src/models')
