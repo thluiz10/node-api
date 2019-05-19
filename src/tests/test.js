@@ -37,14 +37,32 @@ describe('Products', () => {
         .post('/api/products')
         .send(product) // send file
         .end((err, res) => {
-            res.should.have.status(200);
+          res.should.have.status(200);
           done();
         });
     });
   }); 
 
+  describe('/PUT Product', () => {
+    const idObject = '5ce177bd44a600089a3819c3';
+    let product = {
+      title: "Test edit 3", 
+      description: "Test post",
+      url: "test.com/edit"
+    }
+    it('Update product ', function (done) {
+      chai.request(server)
+        .put('/api/products/'+idObject)
+        .send(product)
+        .end(function(err, res) {
+          res.should.have.status(200);
+          done()
+        })
+    })
+  })
+
   describe('Delete Product', () => { 
-    it.only('should delete a SINGLE product on /product/<id> DELETE', function(done) {
+    it('Delete single product', function(done) {
       chai.request(server)
         .get('/api/products')
         .end(function(err, res){
