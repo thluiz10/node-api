@@ -3,7 +3,7 @@ let chai = require('chai');
 let chaiHttp = require('chai-http');
 const server = require(`../../server`);
 let should = chai.should();
-
+const expect = require('chai').expect
 chai.use(chaiHttp);
 
 // Nossa suite de teste relacionada a artigos
@@ -41,5 +41,22 @@ describe('Products', () => {
           done();
         });
     });
-});
+  }); 
+
+  describe('Delete Product', () => { 
+    it.only('should delete a SINGLE product on /product/<id> DELETE', function(done) {
+      chai.request(server)
+        .get('/api/products')
+        .end(function(err, res){
+          chai.request(server)
+            .delete('/api/products/'+res.body.docs[0]._id)
+            .set('Accept', 'application/json')
+            .end(function(error, response){
+              response.should.have.status(200);
+              done();
+          });
+        });
+    });
+  });
+  
 });
