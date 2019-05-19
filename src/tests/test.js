@@ -20,5 +20,22 @@ describe('Products', () => {
                   done();
             });
         });
-    }) 
+  });
+  
+  describe('/POST Product', () => {
+    it('Create product', (done) => {
+        let product = {
+            title: "Test", 
+            description: "Test post",
+            url: "test.com"
+        }
+        chai.request(server)
+        .post('/api/products')
+        .send(product) // send file
+        .end((err, res) => {
+            res.should.have.status(200);
+          done();
+        });
+    });
+});
 });
