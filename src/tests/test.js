@@ -12,20 +12,30 @@ describe('Products', () => {
   // No describe podemos passar um texto para identificação 
   describe('/GET Products', () => {
     it('Testing GET from api', (done) => {
-        chai.request(server) // Endereço do servidor
-            .get('/api/products') // endpoint que vamos testar
-            .end((err, res) => { // testes a serem realizados
-              res.should.have.status(200); // verificando se o retorno e um status code 200
-              res.body.should.be.a('Object'); // Verificando se o retorno e um array
-              res.body.should.all.have.property('docs');
-              res.body.should.all.have.property('total');
-              res.body.should.all.have.property('page');
-              res.body.should.all.have.property('pages');
-              done();
-            });
+      chai.request(server) // Endereço do servidor
+        .get('/api/products') // endpoint que vamos testar
+        .end((err, res) => { // testes a serem realizados
+          res.should.have.status(200); // verificando se o retorno e um status code 200
+          res.body.should.be.a('Object'); // Verificando se o retorno e um array
+          res.body.should.all.have.property('docs');
+          res.body.should.all.have.property('total');
+          res.body.should.all.have.property('page');
+          res.body.should.all.have.property('pages');
+          done();
+        });
     });
+    it ('Testing get one product', (done) => {
+      const idFind = '5ce0221bdefa680f02a158d3';
+      chai.request(server)
+        .get('/api/products/'+idFind)
+        .end((err,res) => {
+          res.should.have.status(200);
+          res.body.should.all.have.property('_id');
+          done();
+        })
+    })
   });
-  
+
   describe('/POST Product', () => {
     it('Create product', (done) => {
       let product = {
