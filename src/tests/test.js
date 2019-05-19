@@ -17,6 +17,10 @@ describe('Products', () => {
                 .end((err, res) => { // testes a serem realizados
                     res.should.have.status(200); // verificando se o retorno e um status code 200
                     res.body.should.be.a('Object'); // Verificando se o retorno e um array
+                    res.body.should.all.have.property('docs');
+                    res.body.should.all.have.property('total');
+                    res.body.should.all.have.property('page');
+                    res.body.should.all.have.property('pages');
                   done();
             });
         });
