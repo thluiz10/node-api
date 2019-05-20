@@ -3,12 +3,29 @@ let chai = require('chai');
 let chaiHttp = require('chai-http');
 const server = require(`../../server`);
 let should = chai.should();
-const expect = require('chai').expect
 chai.use(chaiHttp);
 
+let productId;
 // Nossa suite de teste relacionada a artigos
 describe('Products', () => {
 
+  describe('/POST Product', () => {
+    it('Create product', (done) => {
+      let product = {
+          title: "Test mock", 
+          description: "Test post",
+          url: "test.com"
+      }
+      chai.request(server)
+      .post('/api/products')
+      .send(product) // send file
+      .end((err, res) => {
+        productId = res.body._id
+        res.should.have.status(200);
+        done();
+      });
+    });
+  }); 
   // No describe podemos passar um texto para identificação 
   describe('/GET Products', () => {
     it('Testing GET from api', (done) => {
@@ -25,36 +42,19 @@ describe('Products', () => {
         });
     });
     it ('Testing get one product', (done) => {
-      const idFind = '5ce0221bdefa680f02a158d3';
       chai.request(server)
-        .get('/api/products/'+idFind)
+        .get('/api/products/'+productId)
         .end((err,res) => {
           res.should.have.status(200);
           res.body.should.all.have.property('_id');
+          res.body.should.all.have.property('description');
+          res.body.should.all.have.property('url');
           done();
         })
     })
   });
 
-  describe('/POST Product', () => {
-    it('Create product', (done) => {
-      let product = {
-          title: "Test", 
-          description: "Test post",
-          url: "test.com"
-      }
-      chai.request(server)
-      .post('/api/products')
-      .send(product) // send file
-      .end((err, res) => {
-        res.should.have.status(200);
-        done();
-      });
-    });
-  }); 
-
   describe('/PUT Product', () => {
-    const idObject = '5ce177bd44a600089a3819c3';
     let product = {
       title: "Test edit 3", 
       description: "Test post",
@@ -62,7 +62,7 @@ describe('Products', () => {
     }
     it('Update product ', function (done) {
       chai.request(server)
-        .put('/api/products/'+idObject)
+        .put('/api/products/'+productId)
         .send(product)
         .end(function(err, res) {
           res.should.have.status(200);
@@ -74,17 +74,13 @@ describe('Products', () => {
   describe('Delete Product', () => { 
     it('Delete single product', function(done) {
       chai.request(server)
-        .get('/api/products')
-        .end(function(err, res){
-          chai.request(server)
-            .delete('/api/products/'+res.body.docs[0]._id)
-            .set('Accept', 'application/json')
-            .end(function(error, response){
-              response.should.have.status(200);
-              done();
-          });
+        .delete('/api/products/'+productId)
+        .set('Accept', 'application/json')
+        .end(function(error, res){
+          res.should.have.status(200);
+          done();
         });
     });
   });
-  
+
 });
