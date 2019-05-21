@@ -1,0 +1,16 @@
+version: '2'
+
+services:
+  server:
+    image: node-api
+    build: '.'
+    ports:
+      - '3000:3000'
+    depends_on:
+      - mongo
+    command: node server.js
+  
+  mongo:
+    image: 'mongo'
+    ports:
+      - '27017:27017'

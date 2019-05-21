@@ -7,16 +7,17 @@ const app = express();
 app.use(express.json()); //allow me to send json to the application
 app.use(cors()); //enable access for any doms
 
-mongoose.connect('mongodb://localhost:27017/nodeapi', {useNewUrlParser: true, useFindAndModify: false})
+mongoose.connect(
+  'mongodb://mongo:27017/nodeapi', 
+  {useNewUrlParser: true, 
+  useFindAndModify: false}
+).then ( () => console.log("mongo connected"))
+.catch(err => console.log(err))
+
 requireDir('./src/models')
 
-// const Product = mongoose.model('Product');
-
-// req contains all possible details of the request and res is response to the request
-
-// First route
 app.use('/api', require('./src/routes'))
 
-app.listen(3001);
+app.listen(3000);
 
 module.exports = app;
