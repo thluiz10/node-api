@@ -5,5 +5,6 @@
 ### Execute with docker-compose
 
 ```sh
+docker-compose build
 docker-compose up
 ```
