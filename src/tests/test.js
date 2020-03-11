@@ -1,86 +1,172 @@
+const request = require('supertest');
+const server = require('../../server');
+const chai = require('chai');
+const should = chai.should();
 
-let chai = require('chai');
-let chaiHttp = require('chai-http');
-const server = require(`../../server`);
-let should = chai.should();
-chai.use(chaiHttp);
+chai.use(require('chai-json-schema'));
 
-let productId;
-// Nossa suite de teste relacionada a artigos
 describe('Products', () => {
-
-  describe('/POST Product', () => {
-    it('Create product', (done) => {
-      let product = {
-          title: "Test mock", 
-          description: "Test post",
-          url: "test.com"
+  let testSchema = {
+    required: ['_id', 'title', 'description', 'url', 'createdAt'],
+    properties: {
+      _id: {
+        type: 'string'
+      },
+      title: {
+        type: 'string'
+      },
+      description: {
+        type: 'string'
+      },      
+      url: {
+        type: 'string'
+      },
+      createdAt: {
+        type: 'string'
       }
-      chai.request(server)
-      .post('/api/products')
-      .send(product) // send file
-      .end((err, res) => {
-        productId = res.body._id
-        res.should.have.status(200);
-        done();
-      });
-    });
-  }); 
-  // No describe podemos passar um texto para identificação 
-  describe('/GET Products', () => {
-    it('Testing GET from api', (done) => {
-      chai.request(server) // Endereço do servidor
-        .get('/api/products') // endpoint que vamos testar
-        .end((err, res) => { // testes a serem realizados
-          res.should.have.status(200); // verificando se o retorno e um status code 200
-          res.body.should.be.a('Object'); // Verificando se o retorno e um array
-          res.body.should.all.have.property('docs');
-          res.body.should.all.have.property('total');
-          res.body.should.all.have.property('page');
-          res.body.should.all.have.property('pages');
-          done();
-        });
-    });
-    it ('Testing get one product', (done) => {
-      chai.request(server)
-        .get('/api/products/'+productId)
-        .end((err,res) => {
-          res.should.have.status(200);
-          res.body.should.all.have.property('_id');
-          res.body.should.all.have.property('description');
-          res.body.should.all.have.property('url');
-          done();
-        })
-    })
-  });
-
-  describe('/PUT Product', () => {
-    let product = {
-      title: "Test edit 3", 
-      description: "Test post",
-      url: "test.com/edit"
     }
-    it('Update product ', function (done) {
-      chai.request(server)
-        .put('/api/products/'+productId)
-        .send(product)
-        .end(function(err, res) {
-          res.should.have.status(200);
-          done()
-        })
-    })
-  })
+  };
 
-  describe('Delete Product', () => { 
-    it('Delete single product', function(done) {
-      chai.request(server)
-        .delete('/api/products/'+productId)
+  describe('GET /products', () => {
+    it('respond with json of all registers', (done) => {
+      request(server)
+        .get('/api/products')
         .set('Accept', 'application/json')
-        .end(function(error, res){
-          res.should.have.status(200);
+        .expect('Content-Type', /json/)
+        .expect(200)
+        .end(function(err, res) {
+          res.body.should.all.be.jsonSchema(testSchema);
           done();
         });
     });
+    
+    it('respond with json of a single user', (done) => {
+      request(server)
+        .get('/api/products/5e6292ae2d076c0dd052ab39')
+        .set('Accept', 'application/json')
+        .expect('Content-Type', /json/)
+        .expect(200)
+        .end(function(err, res) {
+          res.body.should.be.jsonSchema(testSchema);
+          done();
+        });
+    });
+    
+    it('respond with error', (done) => {
+      request(server)
+        .get('/api/products/1')
+        .set('Accept', 'application/json')
+        .expect('Not Found')
+        .expect(404, done);
+    });
+
+    it('wrong route', (done) => {
+      request(server)
+        .get('/api/productss')
+        .set('Accept', 'application/json')
+        .expect('Not Found')
+        .expect(404, done);
+    });
+  });
+  
+  describe('POST /products', () => {
+    it('sucessfully add new item', (done) => {
+      let item = {
+        'title': 'post_test',
+        'description': 'post',
+        'url': 'http://google.com'
+      }
+      request(server)
+        .post('/api/products')
+        .set('Accept', 'application/json')
+        .send(item)
+        .expect('Content-Type', /json/)
+        .expect(201)
+        .end(function(err, res) {
+          res.body.should.all.be.jsonSchema(testSchema);
+          done();
+        });
+    });
+    
+    it('empty json', (done) => {
+      let item = {}
+      request(server)
+        .post('/api/products')
+        .set('Accept', 'application/json')
+        .send(item)
+        .expect(400, done);
+    });
+    
+    it('missing title', (done) => {
+      let item = {
+        'description': 'post',
+        'url': 'http://google.com'
+      }
+      request(server)
+        .post('/api/products')
+        .set('Accept', 'application/json')
+        .send(item)
+        .expect(400, done);
+    });
+    
+    it('missing description', (done) => {
+      let item = {
+        'title': 'post_test',
+        'url': 'http://google.com'
+      }
+      request(server)
+        .post('/api/products')
+        .set('Accept', 'application/json')
+        .send(item)
+        .expect(400, done);
+    });
+    
+    it('missing url', (done) => {
+      let item = {
+        'title': 'post_test',
+        'description': 'post'
+      }
+      request(server)
+        .post('/api/products')
+        .set('Accept', 'application/json')
+        .send(item)
+        .expect(400, done);
+    });
   });
 
+  describe('UPDATE /products', () => {
+    it('sucessfully update', (done) => {
+      let item = {
+        'title': 'UPDATE_TEST',
+        'description': 'UPDATING'
+      }
+      request(server)
+        .put('/api/products/5e6292ae2d076c0dd052ab39')
+        .set('Accept', 'application/json')
+        .send(item)
+        .expect(200, done);
+    });
+
+    it('updating wrong id', (done) => {
+      request(server)
+        .put('/api/products/123')
+        .set('Accept', 'application/json')
+        .expect(400, done);
+    });
+  });
+
+  describe('DELETE /products', () => {
+    it('sucessfully delete', (done) => {
+      request(server)
+        .delete('/api/products/5e6292ae2d076c0dd052ab39')
+        .set('Accept', 'application/json')
+        .expect(200, done);
+    });
+
+    it('deleting wrong id', (done) => {
+      request(server)
+        .delete('/api/products/123')
+        .expect(400, done);
+    });
+  });
 });
