@@ -1,1 +1,0 @@
-dependency-check --project 'node-api' --scan src\**\*.js --scan node_modules --scan *.json --exclude src\tests\ --format HTML --format JSON --out reports

@@ -42,12 +42,12 @@ describe('Products', () => {
     
     it('respond with json of a single user', (done) => {
       request(server)
-        .get('/api/products/5e6292ae2d076c0dd052ab39')
+        .get('/api/products/5e6a90ce08e3600d98437b9f')
         .set('Accept', 'application/json')
         .expect('Content-Type', /json/)
         .expect(200)
         .end(function(err, res) {
-          res.body.should.be.jsonSchema(testSchema);
+          res.body.should.all.be.jsonSchema(testSchema);
           done();
         });
     });
@@ -55,14 +55,6 @@ describe('Products', () => {
     it('respond with error', (done) => {
       request(server)
         .get('/api/products/1')
-        .set('Accept', 'application/json')
-        .expect('Not Found')
-        .expect(404, done);
-    });
-
-    it('wrong route', (done) => {
-      request(server)
-        .get('/api/productss')
         .set('Accept', 'application/json')
         .expect('Not Found')
         .expect(404, done);
@@ -141,7 +133,7 @@ describe('Products', () => {
         'description': 'UPDATING'
       }
       request(server)
-        .put('/api/products/5e6292ae2d076c0dd052ab39')
+        .put('/api/products/5e6a90ce08e3600d98437b9f')
         .set('Accept', 'application/json')
         .send(item)
         .expect(200, done);
@@ -158,7 +150,7 @@ describe('Products', () => {
   describe('DELETE /products', () => {
     it('sucessfully delete', (done) => {
       request(server)
-        .delete('/api/products/5e6292ae2d076c0dd052ab39')
+        .delete('/api/products/5e6a90ce08e3600d98437b9f')
         .set('Accept', 'application/json')
         .expect(200, done);
     });

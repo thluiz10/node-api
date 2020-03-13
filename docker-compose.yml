@@ -1,21 +1,46 @@
-version: '2'
-
+version: '3'
 services:
-  server:
-    image: node-api
-    build: '.'
-    ports:
-      - '3000:3000'
-    depends_on:
-      - mongo
-    command: node server.js
-  
-  mongo:
-    image: 'mongo'
-    ports:
-      - '27017:27017'
-    volumes:
-      - mongo:/data/db
-
-volumes:
-  mongo:
+    db:
+        container_name: mongo
+        image: 'mongo'
+        ports:
+          - '27017:27017'
+        volumes:
+          - ./data/db:/data/db
+    sonar:
+        container_name:  sonarqube
+        image:  sonarqube
+        ports:
+          -  "9000:9000"
+          -  "9092:9092"
+    quboo-backend:
+        image: "mechero/quboo-backend"
+        depends_on:
+          -  db
+          -  sonar
+        environment:
+          SPRING_DATA_MONGODB_HOST: mongo
+          GAME_DATES_LEGACY: "${LEGACY_DATE}"
+          GAME_DATES_EARLYBIRD: "${EARLYBIRD_DATE}"
+          GAME_DATES_CAMPAIGNSTART: "${CAMPAIGNSTART_DATE}"
+          GAME_CODE: "${QUBOO_CODE}"
+          SONAR_SERVER: "${SONAR_SERVER}"
+          SONAR_ORGANIZATION: "${SONAR_ORGANIZATION}"
+          SONAR_TOKEN: "${SONAR_TOKEN}"
+        ports:
+          - "8080:8080"
+    quboo-web-client:
+        image: "mechero/quboo-web-client"
+        ports:
+          - "1827:1827"
+        depends_on:
+          - sonar
+    jenkins:
+        image: jenkins/jenkins:lts
+        depends_on:
+            -  quboo-backend
+        ports:
+          -  "8081:8080"
+          -  "50000:50000"
+        volumes:
+          - ./jenkins_home:/var/jenkins_home
