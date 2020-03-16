@@ -11,7 +11,7 @@ mongoose.connect(
   'mongodb://mongo:27017/nodeapi', {
     useNewUrlParser: true,
     useFindAndModify: false,
-    useUnifiedTopology: true
+    useUnifiedTopology: false
   }
 ).then ( () => console.log("mongo connected"))
 .catch(err => console.log(err))
