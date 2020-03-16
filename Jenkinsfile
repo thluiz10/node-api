@@ -3,10 +3,29 @@ pipeline {
         docker { image 'node:alpine' }
     }
     stages {
-        stage('Test') {
+        stage('Install project dependencies') {
             steps {
-                sh 'node --version'
+                sh 'npm install'
+            }
+        }
+
+        stage('Tests and code coverage') {
+            steps {
+                sh 'npm run coverage'
+            }
+        }
+
+        stage('Check dependencies') {
+            steps {
+                sh './run-dependency-check.sh'
+            }
+        }
+
+        stage('Sonar scanner') {
+            steps {
+                sh 'npm run sonar'
             }
         }
     }
 }
+
