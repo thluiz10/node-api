@@ -3,6 +3,4 @@ mongodata
 .*
 reports
 data
-dependency-check/
 jenkins_home/
-run-dependency-check.sh
