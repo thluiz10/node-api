@@ -3,6 +3,12 @@ pipeline {
         docker { image 'node:alpine' }
     }
     stages {
+        stage('Install project dependencies') {
+            steps {
+                sh 'npm install'
+            }
+        }
+
         stage('Tests and code coverage') {
             steps {
                 sh 'npm run coverage'
