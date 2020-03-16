@@ -8,7 +8,7 @@ app.use(express.json()); //allow me to send json to the application
 app.use(cors()); //enable access for any doms
 
 mongoose.connect(
-  'mongodb://mongo:27017/nodeapi', {
+  'mongodb://db:27017/nodeapi', {
     useNewUrlParser: true,
     useFindAndModify: false,
     useUnifiedTopology: false
